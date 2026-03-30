@@ -15,7 +15,7 @@ Criar solução completa em camadas (DB, EJB, Backend, Frontend), corrigindo bug
 ## 📦 Estrutura
 - db/: scripts schema e seed
 - ejb-module/: serviço EJB com bug a ser corrigido
-- backend-module/: backend Spring Boot
+- backend-module/: backend Java 8+
 - frontend/: app Angular
 - docs/: instruções e critérios
 - .github/workflows/: CI
