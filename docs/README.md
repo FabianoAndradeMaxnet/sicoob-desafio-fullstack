@@ -188,12 +188,14 @@ http://localhost:4200
 
 ## 🧪 Testes
 
-* Testes manuais via navegador e Postman
-* Validação de cenários:
+Executar testes:
 
-  * Transferência válida
-  * Saldo insuficiente
-  * Valores inválidos
+ng test
+
+Cobertura:
+- Lista de benefícios
+- Transferência
+- Tratamento de erro
 
 ---
 
