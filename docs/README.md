@@ -1,43 +1,225 @@
-# 🏗️ Desafio Fullstack Integrado
-🚨 Instrução Importante (LEIA ANTES DE COMEÇAR)
-❌ NÃO faça fork deste repositório.
+# 🏗️ Desafio Fullstack Integrado – Sicoob
 
-Este repositório é fornecido como modelo/base. Para realizar o desafio, você deve:
-✅ Opção correta (obrigatória)
-  Clique em “Use this template” (se este repositório estiver marcado como Template)
-OU
-  Clone este repositório e crie um NOVO repositório público em sua conta GitHub.
-📌 O resultado deve ser um repositório próprio, independente deste.
+## 📌 Visão Geral
 
-## 🎯 Objetivo
-Criar solução completa em camadas (DB, EJB, Backend, Frontend), corrigindo bug em EJB e entregando aplicação funcional.
+Este projeto implementa uma solução fullstack completa com arquitetura em camadas, contemplando:
 
-## 📦 Estrutura
-- db/: scripts schema e seed
-- ejb-module/: serviço EJB com bug a ser corrigido
-- backend-module/: backend Java 8+
-- frontend/: app Angular
-- docs/: instruções e critérios
-- .github/workflows/: CI
+* Banco de dados (H2)
+* Camada de serviço (EJB adaptado)
+* Backend REST (Spring Boot)
+* Frontend (Angular Standalone)
 
-## ✅ Tarefas do candidato
-1. Executar db/schema.sql e db/seed.sql
-2. Corrigir bug no BeneficioEjbService
-3. Implementar backend CRUD + integração com EJB
-4. Desenvolver frontend Angular consumindo backend
-5. Implementar testes
-6. Documentar (Swagger, README)
-7. Enviar link para recrutadora com seu repositório para análise
+O sistema permite gerenciar benefícios e realizar transferências entre eles, garantindo integridade dos dados e consistência transacional.
 
-## 🐞 Bug no EJB
-- Transferência não verifica saldo, não usa locking, pode gerar inconsistência
-- Espera-se correção com validações, rollback, locking/optimistic locking
+---
 
-## 📊 Critérios de avaliação
-- Arquitetura em camadas (20%)
-- Correção EJB (20%)
-- CRUD + Transferência (15%)
-- Qualidade de código (10%)
-- Testes (15%)
-- Documentação (10%)
-- Frontend (10%)
+## 🧠 Decisões Técnicas
+
+### 🔹 1. Simplificação do EJB para Spring Service
+
+O serviço originalmente fornecido como EJB foi adaptado para um `@Service` Spring.
+
+**Motivo:**
+
+* O EJB foi adaptado para um serviço Spring (@Service), pois o ambiente Spring Boot não suporta EJB nativamente.
+* Evita dependência de container Java EE
+* Mantém a lógica de negócio intacta
+
+**Resultado:**
+✔ Código mais simples
+✔ Execução standalone
+✔ Fácil manutenção
+
+---
+
+### 🔹 2. Controle Transacional
+
+Utilizado:
+
+```java
+@Transactional
+```
+
+**Motivo:**
+
+* Garantir rollback automático em caso de erro
+* Manter consistência na transferência
+
+---
+
+### 🔹 3. Controle de Concorrência
+
+Implementado:
+
+LockModeType.OPTIMISTIC
+
+
+**Motivo:**
+
+* Evitar inconsistência em atualizações simultâneas
+* Simular comportamento esperado do EJB
+
+---
+
+### 🔹 4. Arquitetura em Camadas
+
+Estrutura adotada:
+
+controller → service → repository → database
+
+
+**Motivo:**
+
+* Separação de responsabilidades
+* Facilidade de testes
+* Código mais organizado
+
+---
+
+### 🔹 5. DTO Pattern
+
+Utilização de DTOs (`BeneficioDTO`, `TransferDTO`)
+
+**Motivo:**
+
+* Evitar exposição direta da entidade
+* Melhor controle de dados trafegados
+
+---
+
+### 🔹 6. Frontend Standalone (Angular 19)
+
+Utilizado Angular com componentes standalone.
+
+**Motivo:**
+
+* Simplifica estrutura (sem AppModule)
+* Melhor organização
+* Aderente às versões mais recentes
+
+---
+
+### 🔹 7. Comunicação entre Componentes
+
+Utilizado:
+
+@Output() atualizado = new EventEmitter<void>();
+
+
+**Motivo:**
+
+* Atualizar lista após transferência
+* Manter componentes desacoplados
+
+---
+
+### 🔹 8. Formatação de Moeda
+
+Utilizado:
+
+currency:'BRL':'symbol':'1.2-2':'pt-BR'
+
+
+**Motivo:**
+
+* Melhor experiência do usuário
+* Adequação ao padrão brasileiro
+
+---
+
+### 🔹 9. Tratamento de CORS
+
+Configurado no backend:
+
+.allowedOrigins("http://localhost:4200")
+
+
+**Motivo:**
+
+* Permitir comunicação frontend/backend em ambiente local
+
+---
+
+## 🐞 Correção do Bug (EJB)
+
+Problemas identificados:
+
+* ❌ Não validava saldo
+* ❌ Não validava valor
+* ❌ Não controlava concorrência
+
+Soluções aplicadas:
+
+✔ Validação de saldo
+✔ Validação de valor positivo
+✔ Lock otimista
+✔ Uso de transação
+
+---
+
+## 🚀 Como Executar
+
+### 🔧 Backend
+
+```bash
+cd backend-module
+mvn clean install
+mvn spring-boot:run
+```
+
+Acesse:
+
+http://localhost:8080/api/v1/beneficios
+
+
+---
+
+### 🎨 Frontend
+
+cd frontend
+npm install
+ng serve
+
+
+Acesse:
+http://localhost:4200
+
+---
+
+## 🧪 Testes
+
+* Testes manuais via navegador e Postman
+* Validação de cenários:
+
+  * Transferência válida
+  * Saldo insuficiente
+  * Valores inválidos
+
+---
+
+## 📊 Funcionalidades
+
+✔ Listar benefícios
+✔ Criar benefício
+✔ Atualizar benefício
+✔ Deletar benefício
+✔ Transferir valores entre benefícios
+
+---
+
+## 🏁 Considerações Finais
+
+A solução prioriza:
+
+* Simplicidade
+* Clareza arquitetural
+* Boas práticas modernas
+* Facilidade de execução
+
+O projeto foi desenvolvido visando equilíbrio entre robustez técnica e praticidade de execução em ambiente de avaliação.
+
+---
+
+## 👨‍💻 Autor
+
+Fabiano Andrade
